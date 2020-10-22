@@ -1,0 +1,25 @@
+{
+  "name": "sera",
+  "version": "1.0.0",
+  "description": "sera application",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "async": "1.5.0",
+    "errors": "serandules/errors#master",
+    "lodash": "4.17.4",
+    "mocha": "^8.2.0",
+    "mongoose": "5.1.8",
+    "nconf": "0.10.0",
+    "request": "2.81.0"
+  },
+  "devDependencies": {
+    "mocha": "5.2.0",
+    "parse-link-header": "1.0.1",
+    "pot": "serandules/pot#master",
+    "request": "2.81.0",
+    "should": "11.2.1"
+  }
+}
