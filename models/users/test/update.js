@@ -5,8 +5,8 @@ var _ = require('lodash');
 var pot = require('pot');
 var errors = require('errors');
 
-var models = require('models');
-var Groups = models.model('groups');
+var sera = require('sera');
+var Groups = sera.model('groups');
 
 describe('PUT /users', function () {
   var client;
@@ -41,7 +41,7 @@ describe('PUT /users', function () {
   };
 
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }
@@ -51,7 +51,7 @@ describe('PUT /users', function () {
           return done(err);
         }
         groups = groupz;
-        pot.createUser(c.serandivesId, {
+        pot.createUser(sera, c.serandivesId, {
           email: 'update-user@serandives.com',
           password: pot.password(),
           username: 'update-user'

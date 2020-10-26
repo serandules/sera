@@ -4,18 +4,19 @@ var request = require('request');
 var pot = require('pot');
 var mongoose = require('mongoose');
 var errors = require('errors');
+var sera = require('sera');
 
 describe('GET /users', function () {
   var user;
   var accessToken;
   var client;
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }
       client = c;
-      pot.createUser(c.serandivesId, {
+      pot.createUser(sera, c.serandivesId, {
         email: 'find-user@serandives.com',
         password: '1@2.Com',
         username: 'find-user'
@@ -106,7 +107,7 @@ describe('GET /users', function () {
   });
 
   it('by admin', function (done) {
-    pot.admin(function (err, admin) {
+    pot.admin(sera, function (err, admin) {
       if (err) {
         return done(err);
       }

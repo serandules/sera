@@ -5,7 +5,7 @@ var should = require('should');
 var request = require('request');
 var async = require('async');
 var pot = require('pot');
-var sera = require('sera');
+var sera = require('../../index');
 
 describe('GET /configs/:id', function () {
   var configs;

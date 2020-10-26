@@ -4,11 +4,12 @@ var request = require('request');
 var pot = require('pot');
 var mongoose = require('mongoose');
 var errors = require('errors');
+var sera = require('../../index');
 
 describe('GET /clients', function () {
     var client;
     before(function (done) {
-        pot.client(function (err, c) {
+        pot.client(sera, function (err, c) {
             if (err) {
                 return done(err);
             }

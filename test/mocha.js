@@ -1,1 +1,1 @@
-require('pot');
+// require('../index');

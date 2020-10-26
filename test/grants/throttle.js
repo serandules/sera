@@ -1,3 +1,4 @@
+var sera = require('../../index');
 var pot = require('pot');
 
-pot.throttlit('apis', 'configs');
+pot.throttlit(sera, 'apis', 'configs');

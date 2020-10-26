@@ -1,11 +1,12 @@
+var sera = require('../../index');
 var pot = require('pot');
 
-pot.throttlit('accounts', 'users');
+pot.throttlit(sera, 'accounts', 'users');
 
 var domain = 'apis';
 var model = 'users';
 
-pot.throttlit(domain, 'users', {
+pot.throttlit(sera, domain, 'users', {
   apis: {
     confirm: {
       second: 0,

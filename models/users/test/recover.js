@@ -4,21 +4,21 @@ var request = require('request');
 var pot = require('pot');
 var errors = require('errors');
 
-var models = require('models');
-var Users = models.model('users');
-var Otps = models.model('otps');
+var sera = require('sera');
+var Users = sera.model('users');
+var Otps = sera.model('otps');
 
 describe('POST /users (recover)', function () {
   var user;
   var accessToken;
   var client;
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }
       client = c;
-      pot.createUser(c.serandivesId, {
+      pot.createUser(sera, c.serandivesId, {
         email: 'test-recover-user@serandives.com',
         password: '1@2.Com',
         username: 'test-recover-user'

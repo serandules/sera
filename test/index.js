@@ -1,5 +1,9 @@
+var nconf = require('nconf').argv().env();
+
+nconf.defaults(require('../env/sera.json'));
+
+var sera = require('../index');
 var pot = require('pot');
-var sera = require('sera');
 
 var initializers = require('../initializers');
 var server = require('./server');
@@ -10,14 +14,17 @@ before(function (done) {
     if (err) {
       return done(err);
     }
-    pot.start(function (initialized) {
+    pot.start(function (err) {
+      if (err) {
+        return done(err);
+      }
       initializers.init(function (err) {
         if (err) {
-          return initialized(err);
+          return done(err);
         }
-        server.start(initialized);
+        server.start(done);
       });
-    }, done);
+    });
   });
 });
 

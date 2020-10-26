@@ -3,12 +3,13 @@ var errors = require('errors');
 var _ = require('lodash');
 var should = require('should');
 var request = require('request');
+var sera = require('../../index');
 var pot = require('pot');
 
 describe('POST /configs', function () {
   var client;
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }

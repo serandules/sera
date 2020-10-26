@@ -45,9 +45,6 @@ module.exports = function (done) {
   var configs = [];
   commons.meta(function (err, o) {
     var facebookId = nconf.get('FACEBOOK_ID');
-    var googleKey = nconf.get('GOOGLE_KEY');
-    var staticsCDN = nconf.get('CDN_STATICS');
-    var imagesCDN = nconf.get('CDN_IMAGES');
     var serandivesId = o.client.id;
     // boots
     var visibility = o.visibility;
@@ -69,11 +66,6 @@ module.exports = function (done) {
           serandives: {
             id: serandivesId
           }
-        },
-        googleKey: googleKey,
-        cdns: {
-          statics: staticsCDN,
-          images: imagesCDN
         }
       },
       permissions: o.permissions,

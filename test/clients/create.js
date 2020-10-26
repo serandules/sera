@@ -2,12 +2,13 @@ var log = require('logger')('service-clients:test:create');
 var errors = require('errors');
 var should = require('should');
 var request = require('request');
+var sera = require('../../index');
 var pot = require('pot');
 
 describe('POST /clients', function () {
     var client;
     before(function (done) {
-        pot.client(function (err, c) {
+        pot.client(sera, function (err, c) {
             if (err) {
                 return done(err);
             }

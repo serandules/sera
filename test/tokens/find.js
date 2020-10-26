@@ -1,9 +1,10 @@
 var log = require('logger')('service-token:test:find');
 var should = require('should');
 var request = require('request');
-var pot = require('pot');
 var mongoose = require('mongoose');
 var errors = require('errors');
+var sera = require('../../index');
+var pot = require('pot');
 
 describe('GET /clients', function () {
   var user;
@@ -11,12 +12,12 @@ describe('GET /clients', function () {
   var client;
   var custom;
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }
       client = c;
-      pot.createUser(c.serandivesId, {
+      pot.createUser(sera, c.serandivesId, {
         username: 'user',
         email: 'user@serandives.com',
         password: '1@2.Com',

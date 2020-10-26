@@ -4,13 +4,13 @@ var request = require('request');
 var pot = require('pot');
 var errors = require('errors');
 
-var sera = require('sera');
+var sera = require('../../index');
 
 describe('GET /grants', function () {
   var client;
   var grant;
   before(function (done) {
-    pot.client(function (err, c) {
+    pot.client(sera, function (err, c) {
       if (err) {
         return done(err);
       }
