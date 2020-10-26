@@ -31,6 +31,6 @@
     "compression": "1.7.4",
     "pot": "serandules/pot#master",
     "serandi": "serandules/serandi#master",
-    "throttle": "serandules/throtte#master"
+    "throttle": "serandules/throttle#master"
   }
 }
