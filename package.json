@@ -15,6 +15,7 @@
     "nconf": "0.10.0",
     "request": "2.81.0",
     "dustjs-linkedin": "2.7.5",
+    "logger": "serandules/logger#master",
     "errors": "serandules/errors#master",
     "lock": "serandules/lock#master",
     "messenger": "serandules/messenger#master"
