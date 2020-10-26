@@ -3,7 +3,7 @@ var _ = require('lodash');
 var async = require('async');
 var fs = require('fs');
 
-var sera = require('sera');
+var sera = require('../index');
 
 var zeroPad = function (name, length) {
     return (Array(length + 1).join('0') + name).slice(-length);

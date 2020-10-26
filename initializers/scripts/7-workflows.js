@@ -1,7 +1,7 @@
 var log = require('logger')('initializers:serandives:workflows');
 var _ = require('lodash');
 
-var sera = require('sera');
+var sera = require('../../index');
 var commons = require('../commons');
 
 module.exports = function (done) {

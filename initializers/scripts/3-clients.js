@@ -1,7 +1,7 @@
 var log = require('logger')('initializers:serandives:clients');
 var utils = require('utils');
 
-var sera = require('sera');
+var sera = require('../../index');
 
 var email = utils.adminEmail();
 

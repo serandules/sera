@@ -2,7 +2,7 @@ var log = require('logger')('initializers:serandives:configs-menus');
 
 var async = require('async');
 
-var sera = require('sera');
+var sera = require('../../index');
 
 var commons = require('../commons');
 

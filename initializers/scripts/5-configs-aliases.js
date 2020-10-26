@@ -1,6 +1,6 @@
 var log = require('logger')('initializers:serandives:configs-aliases');
 
-var sera = require('sera');
+var sera = require('../../index');
 var commons = require('../commons');
 
 module.exports = function (done) {

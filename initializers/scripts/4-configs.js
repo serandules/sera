@@ -3,7 +3,7 @@ var _ = require('lodash');
 var nconf = require('nconf');
 var async = require('async');
 
-var sera = require('sera');
+var sera = require('../../index');
 var commons = require('../commons');
 
 var create = function (user, config, added) {

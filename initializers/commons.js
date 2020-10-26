@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var utils = require('utils');
-var sera = require('sera');
+var sera = require('../index');
 
 var adminUser = utils.adminEmail();
 var supportUser = utils.supportEmail();
