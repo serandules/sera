@@ -18,7 +18,8 @@
     "logger": "serandules/logger#master",
     "errors": "serandules/errors#master",
     "lock": "serandules/lock#master",
-    "messenger": "serandules/messenger#master"
+    "messenger": "serandules/messenger#master",
+    "permission": "serandules/permission#master"
   },
   "devDependencies": {
     "mocha": "5.2.0",
