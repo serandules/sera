@@ -16,6 +16,7 @@
   "FACEBOOK_LOGIN_URI": "https://www.facebook.com/dialog/oauth",
   "FACEBOOK_ID": "facebook-id",
   "FACEBOOK_SECRET": "facebook-secret",
+  "GOOGLE_KEY": "google-key",
   "AWS_KEY": "aws-key",
   "AWS_SECRET": "aws-secret",
   "CAPTCHA_URI": "http://localhost:6060/captcha",

@@ -3,10 +3,10 @@ var bodyParser = require('body-parser');
 
 var errors = require('errors');
 
-var serandi = require('../../plugins/express');
-var mongooseUtils = require('../../utils/mongoose');
+var middlewares = require('../../middlewares');
+var services = require('../../services');
 var validators = require('./validators');
-var model = require('../../model');
+var utils = require('../../utils');
 var Grants = require('./model');
 
 module.exports = function (done) {
@@ -19,15 +19,15 @@ module.exports = function (done) {
   };
 
   service.createOne = function (req, res, next) {
-    serandi.serve(req, res, next,
+    middlewares.serve(req, res, next,
       bodyParser.json(),
-      serandi.json,
-      serandi.create(Grants),
+      middlewares.json,
+      middlewares.create(Grants),
       validators.create,
       function (req, res, next) {
-        model.create(req.ctx, function (err, o) {
+        services.create(req.ctx, function (err, o) {
           if (err) {
-            if (err.code === mongooseUtils.errors.DuplicateKey) {
+            if (err.code === errors.mongoose.DuplicateKey) {
               return next(errors.conflict());
             }
             return next(err);

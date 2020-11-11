@@ -6,9 +6,10 @@ var request = require('request');
 var formidable = require('formidable');
 var errors = require('errors');
 
-var utils = require('../../utils');
-var model = require('../../model');
-var validators = require('../../validators');
+var utils = require('../utils');
+var throttle = require('./throttle');
+var auth = require('./auth');
+var validators = require('../validators');
 var Droute = require('./droute');
 
 var vmodel = validators.model;
@@ -123,7 +124,7 @@ exports.transit = function (o) {
 };
 
 exports.id = function (req, res, next) {
-  if (!model.objectId(req.params.id)) {
+  if (!utils.objectId(req.params.id)) {
     return next(errors.notFound());
   }
   next();
@@ -368,7 +369,7 @@ exports.bumpup = function (route) {
   });
 
   route.use(function (req, res, next) {
-    model.update(req.ctx, function (err, o) {
+    utils.update(req.ctx, function (err, o) {
       if (err) {
         return next(err);
       }
@@ -376,3 +377,9 @@ exports.bumpup = function (route) {
     });
   });
 };
+
+exports.throttleByIP = throttle.byIP;
+
+exports.throttleByAPI = throttle.byAPI;
+
+exports.auth = auth;

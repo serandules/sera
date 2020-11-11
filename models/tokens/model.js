@@ -7,7 +7,7 @@ var _ = require('lodash');
 
 var Lock = require('lock');
 var permission = require('permission');
-var mongoosePlugins = require('../../plugins/mongoose');
+var plugins = require('../../plugins');
 var validators = require('../../validators');
 
 var types = validators.types;
@@ -77,14 +77,14 @@ var schema = Schema({
   }
 }, {collection: 'tokens'});
 
-schema.plugin(mongoosePlugins());
-schema.plugin(mongoosePlugins.user());
-schema.plugin(mongoosePlugins._());
-schema.plugin(mongoosePlugins.visibility());
-schema.plugin(mongoosePlugins.permissions());
-schema.plugin(mongoosePlugins.createdAt());
-schema.plugin(mongoosePlugins.updatedAt());
-schema.plugin(mongoosePlugins.modifiedAt());
+schema.plugin(plugins());
+schema.plugin(plugins.user());
+schema.plugin(plugins._());
+schema.plugin(plugins.visibility());
+schema.plugin(plugins.permissions());
+schema.plugin(plugins.createdAt());
+schema.plugin(plugins.updatedAt());
+schema.plugin(plugins.modifiedAt());
 
 schema.plugin(autopopulate);
 

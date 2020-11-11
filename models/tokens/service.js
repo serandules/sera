@@ -3,8 +3,9 @@ var bodyParser = require('body-parser');
 
 var errors = require('errors');
 
-var serandi = require('../../plugins/express');
-var model = require('../../model');
+var middlewares = require('../../middlewares');
+var services = require('../../services');
+var utils = require('../../utils');
 var validators = require('./validators');
 var Clients = require('../clients/model');
 var Tokens = require('./model');
@@ -49,7 +50,7 @@ var sendToken = function (req, res, next) {
           return;
         }
       }
-      model.create(req.ctx, function (err, token) {
+      services.create(req.ctx, function (err, token) {
         if (err) {
           log.error('tokens:create', err);
           return next(errors.serverError());
@@ -81,11 +82,11 @@ module.exports = function (done) {
   };
 
   service.findOne = function (req, res, next) {
-    serandi.serve(req, res, next,
-      serandi.id,
-      serandi.findOne(Tokens),
+    middlewares.serve(req, res, next,
+      middlewares.id,
+      middlewares.findOne(Tokens),
       function (req, res, next) {
-        model.findOne(req.ctx, function (err, token) {
+        services.findOne(req.ctx, function (err, token) {
           if (err) {
             return next(err);
           }
@@ -104,11 +105,11 @@ module.exports = function (done) {
   };
 
   service.createOne = function (req, res, next) {
-    serandi.serve(req, res, next,
+    middlewares.serve(req, res, next,
       bodyParser.urlencoded({extended: true}),
-      serandi.urlencoded,
+      middlewares.urlencoded,
       validators.grant,
-      serandi.create(Tokens),
+      middlewares.create(Tokens),
       function (req, res, next) {
         sendToken(req, res, next);
       });

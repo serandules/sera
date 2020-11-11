@@ -1,12 +1,26 @@
-var nconf = require('nconf').argv().env();
-
-nconf.defaults(require('../env/sera.json'));
-
 var sera = require('../index');
 var pot = require('pot');
 
-var initializers = require('../initializers');
 var server = require('./server');
+
+
+var userPlugins = function (model, done) {
+  var validators = sera.validators;
+  var types = validators.types;
+
+  model.plugin(function (schema, options) {
+    schema.add({
+      name: {
+        type: String,
+        validator: types.name({
+          length: 200
+        })
+      }
+    });
+  });
+
+  done();
+};
 
 before(function (done) {
   console.log('starting up the server');
@@ -14,15 +28,24 @@ before(function (done) {
     if (err) {
       return done(err);
     }
-    pot.start(function (err) {
+    sera.extend({
+      users: {
+        plugins: userPlugins
+      }
+    }, function (err) {
       if (err) {
         return done(err);
       }
-      initializers.init(function (err) {
+      pot.start(function (err) {
         if (err) {
           return done(err);
         }
-        server.start(done);
+        sera.boot([], function (err) {
+          if (err) {
+            return done(err);
+          }
+          server.start(done);
+        });
       });
     });
   });

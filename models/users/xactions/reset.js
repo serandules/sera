@@ -1,13 +1,13 @@
 var _ = require('lodash');
 var errors = require('errors');
 
-var serandi = require('../../../plugins/express');
-var model = require('../../../model');
+var middlewares = require('../../../middlewares');
+var services = require('../../../services');
 var utils = require('../../../utils');
 var validators = require('../validators');
 
 module.exports = function (route) {
-  route.use(serandi.json);
+  route.use(middlewares.json);
 
   route.use(function (req, res, next) {
     req.ctx.previleged = true;
@@ -18,7 +18,7 @@ module.exports = function (route) {
     if (!req.user) {
       return next(errors.unauthorized());
     }
-    serandi.otp({
+    middlewares.otp({
       name: 'accounts-update',
       user: req.user.id
     })(req, res, next);
@@ -39,7 +39,7 @@ module.exports = function (route) {
   route.use(validators.update);
 
   route.use(function (req, res, next) {
-    model.update(req.ctx, function (err, user) {
+    services.update(req.ctx, function (err, user) {
       if (err) {
         return next(err);
       }

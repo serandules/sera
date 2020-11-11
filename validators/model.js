@@ -7,7 +7,6 @@ var errors = require('errors');
 
 var commons = require('./commons');
 var utils = require('../utils');
-var model = require('../model');
 
 var format = function () {
   return util.format.apply(util.format, Array.prototype.slice.call(arguments));
@@ -240,7 +239,7 @@ var validateCursor = function (ctx, done) {
     if (err) {
       return done(err);
     }
-    model.cast(ctx.model, cursor);
+    utils.cast(ctx.model, cursor);
     done();
   });
 };
@@ -281,9 +280,9 @@ var validateCompounds = function (ctx, done) {
   var schema = ctx.model.schema;
   var compounds = schema.compounds || [];
   var length = compounds.length;
-  var first = model.first(sort);
+  var first = utils.first(sort);
   if (sort[first] === -1) {
-    sort = model.invert(sort);
+    sort = utils.invert(sort);
   }
   for (i = 0; i < length; i++) {
     compound = compounds[i];

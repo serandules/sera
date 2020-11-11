@@ -1,20 +1,14 @@
 var log = require('logger')('initializers:serandives:clients');
-var utils = require('utils');
+var util = require('util');
 
 var sera = require('../../index');
+var utils = require('../../utils');
 
 var email = utils.adminEmail();
-
 var domain = utils.domain();
 
 var to = [
-  utils.resolve('accounts://'),
-  utils.resolve(':///auth'),
-  utils.resolve('www:///auth'),
-  utils.resolve('accounts:///auth'),
-  utils.resolve('admin:///auth'),
-  utils.resolve('autos:///auth'),
-  utils.resolve('realestates:///auth')
+  utils.resolve(domain + ':///auth')
 ];
 
 module.exports = function (done) {
@@ -23,7 +17,7 @@ module.exports = function (done) {
       return done(err);
     }
     if (!user) {
-      return done('No user with email %s can be found.', email);
+      return done(util.format('No user with email %s can be found.', email));
     }
     sera.model('groups').findOne({user: user, name: 'admin'}, function (err, admin) {
       if (err) {

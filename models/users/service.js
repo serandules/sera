@@ -8,10 +8,9 @@ var fs = require('fs');
 var errors = require('errors');
 var messenger = require('messenger');
 
-var mongooseUtils = require('../../utils/mongoose');
+var middlewares = require('../../middlewares');
 var utils = require('../../utils');
-var serandi = require('../../plugins/express');
-var model = require('../../model');
+var services = require('../../services');
 var validators = require('./validators');
 var Users = require('./model');
 var Otps = require('../otps/model');
@@ -53,16 +52,16 @@ module.exports = function (done) {
   };
 
   service.createOne = function (req, res, next) {
-    serandi.serve(req, res, next,
-      serandi.xactions(xactions.post),
+    middlewares.serve(req, res, next,
+      middlewares.xactions(xactions.post),
       bodyParser.json(),
-      serandi.json,
-      serandi.captcha,
-      serandi.create(Users),
+      middlewares.json,
+      middlewares.captcha,
+      middlewares.create(Users),
       function (req, res, next) {
-        model.create(req.ctx, function (err, user) {
+        services.create(req.ctx, function (err, user) {
           if (err) {
-            if (err.code === mongooseUtils.errors.DuplicateKey) {
+            if (err.code === errors.mongoose.DuplicateKey) {
               return next(errors.conflict());
             }
             return next(err);
@@ -87,7 +86,7 @@ module.exports = function (done) {
                   if (err) {
                     return next(err);
                   }
-                  model.create({
+                  services.create({
                     user: user,
                     model: Otps,
                     data: {
@@ -130,11 +129,11 @@ module.exports = function (done) {
   };
 
   service.findOne = function (req, res, next) {
-    serandi.serve(req, res, next,
-      serandi.id,
-      serandi.findOne(Users),
+    middlewares.serve(req, res, next,
+      middlewares.id,
+      middlewares.findOne(Users),
       function (req, res, next) {
-        model.findOne(req.ctx, function (err, user) {
+        services.findOne(req.ctx, function (err, user) {
           if (err) {
             return next(err);
           }
@@ -159,12 +158,12 @@ module.exports = function (done) {
   };
 
   service.replaceOne = function (req, res, next) {
-    serandi.serve(req, res, next,
-      serandi.id,
-      serandi.json,
+    middlewares.serve(req, res, next,
+      middlewares.id,
+      middlewares.json,
       validators.update,
       function (req, res, next) {
-        model.update(req.ctx, function (err, o) {
+        services.update(req.ctx, function (err, o) {
           if (err) {
             return next(err);
           }

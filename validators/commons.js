@@ -1,4 +1,4 @@
-var utils = require('utils');
+var utils = require('../utils');
 
 exports.permitOnly = function (ctx, query, actions, done) {
   // TODO actions --> [action]

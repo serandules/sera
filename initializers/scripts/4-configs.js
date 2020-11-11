@@ -100,9 +100,7 @@ module.exports = function (done) {
       user: o.adminUser,
       name: 'users',
       value: {
-        admin: o.adminUser.id,
-        support: o.supportUser.id,
-        talk: o.talkUser.id
+        admin: o.adminUser.id
       },
       permissions: o.permissions,
       visibility: visibility,

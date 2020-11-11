@@ -5,10 +5,8 @@ var crypto = require('crypto');
 
 var errors = require('errors');
 
-var serandi = require('../../plugins/express');
+var middlewares = require('../../middlewares');
 var utils = require('../../utils');
-var mongooseUtils = require('../../utils/mongoose');
-var model = require('../../model');
 var Tokens = require('../tokens/model');
 var Users = require('../users/model');
 var Clients = require('../clients/model');
@@ -295,7 +293,7 @@ var facebookGrant = function (req, res, next) {
             if (err) {
               return done(err);
             }
-            model.create({
+            utils.create({
               model: Users,
               data: {
                 email: email,
@@ -306,7 +304,7 @@ var facebookGrant = function (req, res, next) {
               overrides: {}
             }, function (err, user) {
               if (err) {
-                if (err.code === mongooseUtils.errors.DuplicateKey) {
+                if (err.code === errors.mongoose.DuplicateKey) {
                   return next(errors.conflict());
                 }
                 log.error('users:create', err);
@@ -355,7 +353,7 @@ var facebookGrant = function (req, res, next) {
 exports.grant = function (req, res, next) {
   var type = req.body.grant_type;
   if (type === 'password') {
-    serandi.captcha(req, res, function (err) {
+    middlewares.captcha(req, res, function (err) {
       if (err) {
         return next(err);
       }

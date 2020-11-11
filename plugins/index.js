@@ -2,7 +2,7 @@ var log = require('logger')('mongutils');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var validators = require('../../validators');
+var validators = require('../validators');
 
 var types = validators.types;
 var values = validators.values;

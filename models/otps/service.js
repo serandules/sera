@@ -1,8 +1,9 @@
 var log = require('logger')('service-locations');
 var bodyParser = require('body-parser');
 
-var serandi = require('../../plugins/express');
-var model = require('../../model');
+var middlewares = require('../../middlewares');
+var services = require('../../services');
+var utils = require('../../utils');
 var validators = require('./validators');
 var Otps = require('./model');
 
@@ -13,10 +14,10 @@ module.exports = function (done) {
   };
 
   service.createOne = function (req, res, next) {
-    serandi.serve(req, res, next,
+    middlewares.serve(req, res, next,
       bodyParser.json(),
-      serandi.json,
-      serandi.create(Otps),
+      middlewares.json,
+      middlewares.create(Otps),
       validators.create,
       function (req, res, next) {
         Otps.remove({
@@ -26,7 +27,7 @@ module.exports = function (done) {
           if (err) {
             return next(err);
           }
-          model.create(req.ctx, function (err, otp) {
+          services.create(req.ctx, function (err, otp) {
             if (err) {
               return next(err);
             }

@@ -1,8 +1,8 @@
 var log = require('logger')('auth');
 var errors = require('errors');
 
-var Otps = require('../../../models/otps/model');
-var Tokens = require('../../../models/tokens/model');
+var Otps = require('../../models/otps/model');
+var Tokens = require('../../models/tokens/model');
 
 module.exports = function (options) {
   options = options || {};

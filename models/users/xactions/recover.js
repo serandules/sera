@@ -8,8 +8,8 @@ var util = require('util');
 var messenger = require('messenger');
 
 var utils = require('../../../utils');
-var serandi = require('../../../plugins/express');
-var model = require('../../../model');
+var middlewares = require('../../../middlewares');
+var services = require('../../../services');
 var Otps = require('../../otps/model');
 var Users = require('../model');
 
@@ -28,7 +28,7 @@ var recover = function (user, done) {
     if (err) {
       return done(err);
     }
-    model.create({
+    services.create({
       user: user,
       model: Otps,
       data: {
@@ -63,16 +63,16 @@ var recover = function (user, done) {
 };
 
 module.exports = function (route) {
-  route.use(serandi.json);
-  route.use(serandi.captcha);
-  route.use(serandi.query);
+  route.use(middlewares.json);
+  route.use(middlewares.captcha);
+  route.use(middlewares.query);
 
   route.use(function (req, res, next) {
     req.ctx.previleged = true;
     next();
   });
 
-  route.use(serandi.find(Users));
+  route.use(middlewares.find(Users));
 
   route.use(function (req, res, next) {
     var ctx = req.ctx;
@@ -81,7 +81,7 @@ module.exports = function (route) {
   });
 
   route.use(function (req, res, next) {
-    model.find(req.ctx, function (err, users, paging) {
+    services.find(req.ctx, function (err, users, paging) {
       if (err) {
         return next(err);
       }

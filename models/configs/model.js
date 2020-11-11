@@ -2,9 +2,9 @@ var log = require('logger')('model-configs');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var mongoosePlugins = require('../../plugins/mongoose');
+var plugins = require('../../plugins');
 var validators = require('../../validators');
-var model = require('../../model');
+var utils = require('../../utils');
 
 var types = validators.types;
 
@@ -27,7 +27,7 @@ var schema = Schema({
   }
 }, {collection: 'configs'});
 
-schema.plugin(mongoosePlugins({
+schema.plugin(plugins({
   transform: function (o) {
     try {
       o.value = JSON.parse(o.value);
@@ -36,24 +36,24 @@ schema.plugin(mongoosePlugins({
     }
   }
 }));
-schema.plugin(mongoosePlugins.user());
-schema.plugin(mongoosePlugins._({
+schema.plugin(plugins.user());
+schema.plugin(plugins._({
   workflow: 'model'
 }));
-schema.plugin(mongoosePlugins.permissions({
+schema.plugin(plugins.permissions({
   workflow: 'model'
 }));
-schema.plugin(mongoosePlugins.status({
+schema.plugin(plugins.status({
   workflow: 'model'
 }));
-schema.plugin(mongoosePlugins.visibility({
+schema.plugin(plugins.visibility({
   workflow: 'model'
 }));
-schema.plugin(mongoosePlugins.createdAt());
-schema.plugin(mongoosePlugins.updatedAt());
-schema.plugin(mongoosePlugins.modifiedAt());
+schema.plugin(plugins.createdAt());
+schema.plugin(plugins.updatedAt());
+schema.plugin(plugins.modifiedAt());
 
-model.ensureIndexes(schema, [
+utils.ensureIndexes(schema, [
   {name: 1, updatedAt: 1, _id: 1}
 ]);
 

@@ -19,7 +19,6 @@ describe('POST /users', function () {
       if (e) {
         return done(e);
       }
-      console.log(b)
       r.statusCode.should.equal(errors.unsupportedMedia().status);
       should.exist(b);
       b = JSON.parse(b);
@@ -382,6 +381,36 @@ describe('POST /users', function () {
       should.exist(b.id);
       should.exist(b.email);
       b.email.should.equal('create-user@serandives.com');
+      should.exist(r.headers['location']);
+      r.headers['location'].should.equal(pot.resolve('apis', '/v/users/' + b.id));
+      done();
+    });
+  });
+
+  it('with extended name', function (done) {
+    request({
+      uri: pot.resolve('apis', '/v/users'),
+      method: 'POST',
+      headers: {
+        'X-Captcha': 'dummy'
+      },
+      json: {
+        email: 'extended-user@serandives.com',
+        password: '1@2.Com',
+        username: 'extended-user',
+        name: 'Extended User'
+      }
+    }, function (e, r, b) {
+      if (e) {
+        return done(e);
+      }
+      r.statusCode.should.equal(201);
+      should.exist(b);
+      should.exist(b.id);
+      should.exist(b.email);
+      should.exist(b.name);
+      b.email.should.equal('extended-user@serandives.com');
+      b.name.should.equal('Extended User');
       should.exist(r.headers['location']);
       r.headers['location'].should.equal(pot.resolve('apis', '/v/users/' + b.id));
       done();

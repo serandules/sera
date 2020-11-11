@@ -2,7 +2,7 @@ var log = require('logger')('model-otps');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var mongoosePlugins = require('../../plugins/mongoose');
+var plugins = require('../../plugins');
 var validators = require('../../validators');
 
 var types = validators.types;
@@ -53,13 +53,13 @@ var schema = Schema({
   }
 }, {collection: 'otps'});
 
-schema.plugin(mongoosePlugins());
-schema.plugin(mongoosePlugins.user());
-schema.plugin(mongoosePlugins._());
-schema.plugin(mongoosePlugins.permissions());
-schema.plugin(mongoosePlugins.visibility());
-schema.plugin(mongoosePlugins.createdAt());
-schema.plugin(mongoosePlugins.updatedAt());
-schema.plugin(mongoosePlugins.modifiedAt({expires: 600}));
+schema.plugin(plugins());
+schema.plugin(plugins.user());
+schema.plugin(plugins._());
+schema.plugin(plugins.permissions());
+schema.plugin(plugins.visibility());
+schema.plugin(plugins.createdAt());
+schema.plugin(plugins.updatedAt());
+schema.plugin(plugins.modifiedAt({expires: 600}));
 
 module.exports = mongoose.model('otps', schema);

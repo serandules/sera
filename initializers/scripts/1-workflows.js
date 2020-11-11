@@ -1,7 +1,7 @@
 var log = require('logger')('initializers:serandives:workflows');
-var utils = require('utils');
 
 var sera = require('../../index');
+var utils = require('../../utils');
 
 var adminEmail = utils.adminEmail();
 
@@ -25,13 +25,8 @@ module.exports = function (done) {
           if (err) {
             return done(err);
           }
-          workflowModelMessages(user, function (err) {
-            if (err) {
-              return done(err);
-            }
-            log.info('workflow:created');
-            done();
-          });
+          log.info('workflow:created');
+          done();
         });
       });
     });
@@ -253,67 +248,6 @@ var workflowModelClients = function (user, done) {
         },
         user: {
           actions: ['read', 'update', 'delete', 'move'],
-          visibility: ['*']
-        }
-      }
-    },
-    visibility: {},
-    permissions: {}
-  }, done);
-};
-
-var workflowModelMessages = function (user, done) {
-  sera.model('workflows').create({
-    name: 'model-messages',
-    user: user,
-    _: {},
-    start: 'sent',
-    transitions: {
-      sent: {
-        receive: 'received'
-      },
-      received: {
-        unreceive: 'sent'
-      }
-    },
-    permits: {
-      sent: {
-        groups: {
-          admin: {
-            actions: ['*'],
-            visibility: ['*']
-          }
-        },
-        model: {
-          to: {
-            user: {
-              actions: ['read', 'receive', 'delete'],
-              visibility: ['*']
-            }
-          }
-        },
-        user: {
-          actions: ['read', 'update', 'delete'],
-          visibility: ['*']
-        }
-      },
-      received: {
-        groups: {
-          admin: {
-            actions: ['*'],
-            visibility: ['*']
-          }
-        },
-        model: {
-          to: {
-            user: {
-              actions: ['read', 'unreceive', 'delete'],
-              visibility: ['*']
-            }
-          }
-        },
-        user: {
-          actions: ['read'],
           visibility: ['*']
         }
       }

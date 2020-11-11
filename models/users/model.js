@@ -1,10 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var mongoosePlugin = require('../../plugins/mongoose');
-var utils = require('../../utils');
+var plugins = require('../../plugins');
 var validators = require('../../validators');
-var model = require('../../model');
+var utils = require('../../utils');
 
 var types = validators.types;
 var values = validators.values;
@@ -53,24 +52,24 @@ var schema = Schema({
   }
 }, {collection: 'users'});
 
-schema.plugin(mongoosePlugin());
-schema.plugin(mongoosePlugin._({
+schema.plugin(plugins());
+schema.plugin(plugins._({
   workflow: 'model-users'
 }));
-schema.plugin(mongoosePlugin.status({
+schema.plugin(plugins.status({
   workflow: 'model-users'
 }));
-schema.plugin(mongoosePlugin.permissions({
+schema.plugin(plugins.permissions({
   workflow: 'model-users'
 }));
-schema.plugin(mongoosePlugin.visibility({
+schema.plugin(plugins.visibility({
   workflow: 'model-users'
 }));
-schema.plugin(mongoosePlugin.createdAt());
-schema.plugin(mongoosePlugin.updatedAt());
-schema.plugin(mongoosePlugin.modifiedAt());
+schema.plugin(plugins.createdAt());
+schema.plugin(plugins.updatedAt());
+schema.plugin(plugins.modifiedAt());
 
-model.ensureIndexes(schema, [
+utils.ensureIndexes(schema, [
   {updatedAt: -1, _id: -1}
 ]);
 

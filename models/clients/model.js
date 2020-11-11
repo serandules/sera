@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var crypto = require('crypto');
 
-var mongoosePlugins = require('../../plugins/mongoose');
+var plugins = require('../../plugins');
 var validators = require('../../validators');
 
 var types = validators.types;
@@ -36,23 +36,23 @@ var schema = Schema({
     }
 }, {collection: 'clients'});
 
-schema.plugin(mongoosePlugins());
-schema.plugin(mongoosePlugins.user());
-schema.plugin(mongoosePlugins._({
+schema.plugin(plugins());
+schema.plugin(plugins.user());
+schema.plugin(plugins._({
     workflow: 'model-clients'
 }));
-schema.plugin(mongoosePlugins.permissions({
+schema.plugin(plugins.permissions({
     workflow: 'model-clients'
 }));
-schema.plugin(mongoosePlugins.status({
+schema.plugin(plugins.status({
     workflow: 'model-clients'
 }));
-schema.plugin(mongoosePlugins.visibility({
+schema.plugin(plugins.visibility({
     workflow: 'model-clients'
 }));
-schema.plugin(mongoosePlugins.createdAt());
-schema.plugin(mongoosePlugins.updatedAt());
-schema.plugin(mongoosePlugins.modifiedAt());
+schema.plugin(plugins.createdAt());
+schema.plugin(plugins.updatedAt());
+schema.plugin(plugins.modifiedAt());
 
 schema.methods.verify = function (secret) {
     return this.secret === secret;

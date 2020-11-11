@@ -1,12 +1,12 @@
 var log = require('logger')('utils');
 var nconf = require('nconf');
 var bcrypt = require('bcrypt');
+var mongoose = require('mongoose');
 var async = require('async');
 var AWS = require('aws-sdk');
 var Redis = require('ioredis');
 var once = require('once');
 var diff = require('deep-object-diff').diff;
-var mongoose = require('mongoose');
 var uuidv4 = require('uuid/v4');
 var stringify = require('json-stringify-safe');
 var _ = require('lodash');
@@ -14,21 +14,13 @@ var format = require('string-template');
 
 var errors = require('errors');
 
-var sera = require('../index')
+var ObjectId = mongoose.Types.ObjectId;
 
 var env = nconf.get('ENV');
 
 var SALT_WORK_FACTOR = 10;
 
 var BUMP_UP_THRESHOLD = 14 * 24 * 60 * 60 * 1000;
-
-var users = {};
-
-var groups = {};
-
-var workflows = {};
-
-var tiers = {};
 
 var redis;
 
@@ -38,103 +30,13 @@ var client;
 
 var modelUpdatesQueueUrl;
 
-var findModelUpdatesQueueUrl = function (done) {
-  if (modelUpdatesQueueUrl) {
-    return done(null, modelUpdatesQueueUrl);
-  }
-  exports.sqs().getQueueUrl({
-    QueueName: exports.queue('model-updates') + '.fifo'
-  }, function (err, o) {
-    if (err) {
-      return done(err);
-    }
-    modelUpdatesQueueUrl = o.QueueUrl;
-    done(null, modelUpdatesQueueUrl);
-  });
-};
+var users = {};
 
-exports.once = once;
+var groups = {};
 
-exports.none = function () {
+var workflows = {};
 
-};
-
-exports.env = function () {
-  return env;
-};
-
-exports.domain = function () {
-  return nconf.get('DOMAIN');
-};
-
-exports.emailDomain = function () {
-  return nconf.get('EMAIL_DOMAIN');
-};
-
-var cacheKey = function (key) {
-  return 'caches:' + key;
-};
-
-exports.cache = function (key, value, done) {
-  if (!value) {
-    exports.redis().del(cacheKey(key));
-    return done();
-  }
-  exports.redis().set(cacheKey(key), value);
-  done();
-};
-
-exports.cached = function (key, done) {
-  exports.redis().get(cacheKey(key), function (err, value) {
-    if (err) {
-      return done(err);
-    }
-    done(null, value);
-  })
-};
-
-exports.subdomain = function () {
-  return nconf.get('SUBDOMAIN');
-};
-
-exports.adminEmail = function () {
-  return 'admin@' + exports.emailDomain();
-};
-
-exports.supportEmail = function () {
-  return 'support@' + exports.emailDomain();
-};
-
-exports.talkEmail = function () {
-  return 'talk@' + exports.emailDomain();
-};
-
-exports.client = function (done) {
-  if (client) {
-    return done(null, client);
-  }
-  sera.model('clients').findOne({name: exports.domain()}).exec(function (err, c) {
-    if (err) {
-      return done(err);
-    }
-    if (!c) {
-      return done('No client with name ' + exports.domain() + ' can be found.');
-    }
-    client = exports.json(c);
-    done(null, c);
-  });
-};
-
-exports.merge = function (a, b) {
-  if (a && b) {
-    for (var key in b) {
-      if (b.hasOwnProperty(key)) {
-        a[key] = a[key] || b[key];
-      }
-    }
-  }
-  return a;
-};
+var tiers = {};
 
 var s3 = new AWS.S3({
   region: 'ap-southeast-1',
@@ -163,6 +65,125 @@ var sns = new AWS.SNS({
   accessKeyId: nconf.get('AWS_KEY'),
   secretAccessKey: nconf.get('AWS_SECRET')
 });
+
+var transitable = function (model, o, from, to, done) {
+  var schema = model.schema;
+  var paths = schema.paths;
+  var verified = o._ && o._.verified || {};
+  async.eachLimit(Object.keys(paths), 1, function (field, processed) {
+    var path = paths[field];
+    var options = path.options || {};
+    var verify = options.verify;
+    if (!verify) {
+      return processed();
+    }
+    if (verify.indexOf(to) === -1) {
+      return processed();
+    }
+    if (verified[field]) {
+      return processed();
+    }
+    if (!o[field] && !options.required) {
+      return processed();
+    }
+    processed(errors.forbidden('\'' + field + '\' needs to be verified before changing the state'));
+  }, done);
+};
+
+var findModelUpdatesQueueUrl = function (done) {
+  if (modelUpdatesQueueUrl) {
+    return done(null, modelUpdatesQueueUrl);
+  }
+  exports.sqs().getQueueUrl({
+    QueueName: exports.queue('model-updates') + '.fifo'
+  }, function (err, o) {
+    if (err) {
+      return done(err);
+    }
+    modelUpdatesQueueUrl = o.QueueUrl;
+    done(null, modelUpdatesQueueUrl);
+  });
+};
+
+var cacheKey = function (key) {
+  return 'caches:' + key;
+};
+
+exports.model = function (name) {
+  var sera = require('../index');
+  return sera.model(name);
+};
+
+exports.once = once;
+
+exports.none = function () {
+
+};
+
+exports.env = function () {
+  return env;
+};
+
+exports.domain = function () {
+  return nconf.get('DOMAIN');
+};
+
+exports.emailDomain = function () {
+  return nconf.get('EMAIL_DOMAIN');
+};
+
+exports.cache = function (key, value, done) {
+  if (!value) {
+    exports.redis().del(cacheKey(key));
+    return done();
+  }
+  exports.redis().set(cacheKey(key), value);
+  done();
+};
+
+exports.cached = function (key, done) {
+  exports.redis().get(cacheKey(key), function (err, value) {
+    if (err) {
+      return done(err);
+    }
+    done(null, value);
+  })
+};
+
+exports.subdomain = function () {
+  return nconf.get('SUBDOMAIN');
+};
+
+exports.adminEmail = function () {
+  return 'admin@' + exports.emailDomain();
+};
+
+exports.client = function (done) {
+  if (client) {
+    return done(null, client);
+  }
+  exports.model('clients').findOne({name: exports.domain()}).exec(function (err, c) {
+    if (err) {
+      return done(err);
+    }
+    if (!c) {
+      return done('No client with name ' + exports.domain() + ' can be found.');
+    }
+    client = exports.json(c);
+    done(null, c);
+  });
+};
+
+exports.merge = function (a, b) {
+  if (a && b) {
+    for (var key in b) {
+      if (b.hasOwnProperty(key)) {
+        a[key] = a[key] || b[key];
+      }
+    }
+  }
+  return a;
+};
 
 exports.s3 = function () {
   return s3;
@@ -254,7 +275,7 @@ exports.findUser = function (email, done) {
   if (user) {
     return done(null, user);
   }
-  sera.model('users').findOne({email: email}, function (err, user) {
+  exports.model('users').findOne({email: email}, function (err, user) {
     if (err) {
       return done(err)
     }
@@ -290,7 +311,7 @@ exports.findGroup = function (user, name, done) {
   if (group) {
     return done(null, group);
   }
-  sera.model('groups').findOne({user: user, name: name}, function (err, group) {
+  exports.model('groups').findOne({user: user, name: name}, function (err, group) {
     if (err) {
       return done(err)
     }
@@ -305,7 +326,7 @@ exports.findWorkflow = function (user, name, done) {
   if (workflow) {
     return done(null, workflow);
   }
-  sera.model('workflows').findOne({user: user, name: name}, function (err, workflow) {
+  exports.model('workflows').findOne({user: user, name: name}, function (err, workflow) {
     if (err) {
       return done(err)
     }
@@ -370,7 +391,7 @@ exports.findTier = function (user, name, done) {
   if (tier) {
     return done(null, tier);
   }
-  sera.model('tiers').findOne({user: user, name: name}, function (err, tier) {
+  exports.model('tiers').findOne({user: user, name: name}, function (err, tier) {
     if (err) {
       return done(err)
     }
@@ -700,30 +721,6 @@ exports.toVisibility = function (user, workflow, status, o, done) {
   });
 };
 
-var transitable = function (model, o, from, to, done) {
-  var schema = model.schema;
-  var paths = schema.paths;
-  var verified = o._ && o._.verified || {};
-  async.eachLimit(Object.keys(paths), 1, function (field, processed) {
-    var path = paths[field];
-    var options = path.options || {};
-    var verify = options.verify;
-    if (!verify) {
-      return processed();
-    }
-    if (verify.indexOf(to) === -1) {
-      return processed();
-    }
-    if (verified[field]) {
-      return processed();
-    }
-    if (!o[field] && !options.required) {
-      return processed();
-    }
-    processed(errors.forbidden('\'' + field + '\' needs to be verified before changing the state'));
-  }, done);
-};
-
 exports.transit = function (o, done) {
   var id = o.id;
   var action = o.action;
@@ -809,4 +806,93 @@ exports.delayed = function () {
   setTimeout(function () {
     done.apply(null, args);
   }, delay);
+};
+
+exports.objectId = function (id) {
+  return id && id.match(/^[0-9a-fA-F]{24}$/);
+};
+
+exports.ensureIndexes = function (schema, compounds, o) {
+  var paths = schema.paths;
+  Object.keys(paths).forEach(function (path) {
+    var oo = paths[path];
+    var options = oo.options || {};
+    if (!options.searchable && !options.sortable) {
+      return;
+    }
+    var index = {};
+    index[path] = 1;
+    if (!options.sortable) {
+      schema.index(index);
+      return;
+    }
+    index._id = 1;
+    compounds.push(index);
+    schema.index(index);
+  });
+  var extended = [];
+  compounds.forEach(function (oo) {
+    schema.index(oo, o);
+    var exd = _.cloneDeep(oo);
+    exd[Object.keys(exd)[0]] = -1;
+    schema.index(exd, o);
+    extended.push(exd);
+  });
+  schema.compounds = compounds.concat(extended);
+};
+
+exports.cast = function (model, data) {
+  var schema = model.schema;
+  var paths = schema.paths;
+  var field;
+  var options;
+  var type;
+  for (field in data) {
+    if (!data.hasOwnProperty(field)) {
+      continue;
+    }
+    options = paths[field].options;
+    type = options.type;
+    if (field === '_id') {
+      data[field] = new ObjectId(data[field]);
+      continue
+    }
+    data[field] = new type(data[field]);
+  }
+  return data;
+};
+
+exports.invert = function (o) {
+  var key;
+  var clone = _.cloneDeep(o);
+  for (key in clone) {
+    if (!clone.hasOwnProperty(key)) {
+      continue;
+    }
+    clone[key] *= -1;
+  }
+  return clone;
+};
+
+exports.first = function (o) {
+  var key;
+  for (key in o) {
+    if (!o.hasOwnProperty(key)) {
+      continue;
+    }
+    return key;
+  }
+  return null;
+};
+
+exports.cursor = function (index, o) {
+  var field;
+  var cursor = {};
+  for (field in index) {
+    if (!index.hasOwnProperty(field)) {
+      continue;
+    }
+    cursor[field] = o[field];
+  }
+  return cursor;
 };

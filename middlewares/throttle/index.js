@@ -4,12 +4,11 @@ var _ = require('lodash');
 var moment = require('moment');
 var nconf = require('nconf');
 var util = require('util');
-var url = require('url');
-var mongoose = require('mongoose');
 
 var errors = require('errors');
 
-var utils = require('../../../utils');
+var Tiers = require('../../models/tiers/model');
+var utils = require('../../utils');
 
 var apisDurations = ['second', 'day', 'month'];
 
@@ -30,7 +29,7 @@ var tierInfo = function (req, done) {
   if (token) {
     return done(null, token.tier, token.id)
   }
-  mongoose.model('tiers').findOne({name: 'free'}, function (err, tier) {
+  Tiers.findOne({name: 'free'}, function (err, tier) {
     if (err) {
       return done(err);
     }
@@ -162,7 +161,7 @@ var ips = function (tier, ip, id, action, done) {
   });
 };
 
-exports.ips = function () {
+exports.byIP = function () {
   return function (req, res, next) {
     if (unthrottle) {
       return next();
@@ -246,7 +245,7 @@ var apis = function (tier, id, name, action, done) {
   });
 };
 
-exports.apis = function (name) {
+exports.byAPI = function (name) {
   return function (req, res, next) {
     if (unthrottle) {
       return next();

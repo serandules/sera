@@ -1,10 +1,7 @@
 var async = require('async');
 var crypto = require('crypto');
 
-var errors = require('errors');
-
 var utils = require('../utils');
-var commons = require('./commons');
 
 exports.values = {};
 

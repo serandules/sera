@@ -7,11 +7,10 @@ var cors = require('cors');
 var compression = require('compression');
 var format = require('string-template');
 
-var utils = require('utils');
-var serandi = require('serandi');
-var throttle = require('throttle');
+var middlewares = require('../middlewares');
 var errors = require('errors');
 var sera = require('../index');
+var utils = require('../utils');
 
 var server;
 
@@ -43,8 +42,8 @@ exports.start = function (done) {
     }
     apps.disable('x-powered-by');
     apps.use(morgan(':remote-addr :method :url :status :res[content-length] - :response-time ms'));
-    apps.use(serandi.pond);
-    apps.use(throttle(sera.model('tiers')));
+    apps.use(middlewares.pond);
+    apps.use(middlewares.throttleByIP(sera.model('tiers')));
     apps.use(cors({
       exposedHeaders: ['Content-Type', 'Link']
     }));
@@ -61,7 +60,7 @@ exports.start = function (done) {
     }
 
     if (nconf.get('SERVER_SSL')) {
-      apps.use(serandi.ssl);
+      apps.use(middlewares.ssl);
     }
 
     var host = format(subdomain, {subdomain: 'apis'}) + '.' + domain;

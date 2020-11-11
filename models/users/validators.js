@@ -1,12 +1,12 @@
 var errors = require('errors');
-var serandi = require('../../plugins/express');
+var middlewares = require('../../middlewares');
 var validators = require('../../validators');
 var Users = require('./model');
 
 var model = validators.model;
 
 exports.update = function (req, res, next) {
-  serandi.update(Users)(req, res, function (err) {
+  middlewares.update(Users)(req, res, function (err) {
     if (err) {
       return next(err);
     }
@@ -22,7 +22,7 @@ exports.update = function (req, res, next) {
       if (!data.password) {
         return next();
       }
-      serandi.otp({
+      middlewares.otp({
         name: 'accounts-update',
         user: req.ctx.id
       })(req, res, next);
