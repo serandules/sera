@@ -14,17 +14,51 @@ var utils = require('../utils');
 
 var server;
 
+var userPlugins = function (model, done) {
+  var validators = sera.validators;
+  var types = validators.types;
+
+  model.plugin(function (schema, options) {
+    schema.add({
+      name: {
+        type: String,
+        validator: types.name({
+          length: 200
+        })
+      }
+    });
+  });
+
+  done();
+};
+
 process.on('uncaughtException', function (err) {
   log.error('uncaught:threw', err);
   process.exit(1);
 });
 
-var loadServices = function (prefix, server, done) {
-  sera({
-    prefix: prefix,
-    server: server,
-    models: {}
-  }, done);
+var load = function (prefix, server, done) {
+  sera(function (err) {
+    if (err) {
+      return done(err);
+    }
+    sera.extend({
+      users: {
+        plugins: userPlugins
+      },
+      locations: require('./locations')
+    }, function (err) {
+      if (err) {
+        return done(err);
+      }
+      sera.boot([], function (err) {
+        if (err) {
+          return done(err);
+        }
+        sera.serve({prefix: prefix, server: server}, done);
+      });
+    });
+  });
 };
 
 exports.start = function (done) {
@@ -36,7 +70,7 @@ exports.start = function (done) {
   var version = 'v';
   var prefix = '/' + version;
 
-  loadServices(prefix, services, function (err) {
+  load(prefix, services, function (err) {
     if (err) {
       return done(err);
     }
