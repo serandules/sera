@@ -37,7 +37,7 @@ process.on('uncaughtException', function (err) {
   process.exit(1);
 });
 
-var load = function (prefix, server, done) {
+exports.prepare = function (done) {
   sera(function (err) {
     if (err) {
       return done(err);
@@ -47,17 +47,7 @@ var load = function (prefix, server, done) {
         plugins: userPlugins
       },
       locations: require('./locations')
-    }, function (err) {
-      if (err) {
-        return done(err);
-      }
-      sera.boot([], function (err) {
-        if (err) {
-          return done(err);
-        }
-        sera.serve({prefix: prefix, server: server}, done);
-      });
-    });
+    }, done);
   });
 };
 
@@ -70,7 +60,7 @@ exports.start = function (done) {
   var version = 'v';
   var prefix = '/' + version;
 
-  load(prefix, services, function (err) {
+  sera.serve({prefix: prefix, server: services}, function (err) {
     if (err) {
       return done(err);
     }

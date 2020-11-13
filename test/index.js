@@ -1,3 +1,4 @@
+var sera = require('../index');
 var server = require('./server');
 var pot = require('pot');
 
@@ -7,7 +8,17 @@ before(function (done) {
     if (err) {
       return done(err);
     }
-    server.start(done);
+    server.prepare(function (err) {
+      if (err) {
+        return done(err);
+      }
+      sera.boot([], function (err) {
+        if (err) {
+          return done(err);
+        }
+        server.start(done);
+      });
+    });
   });
 });
 
