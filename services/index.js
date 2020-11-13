@@ -144,18 +144,6 @@ var must = function (serve) {
   };
 };
 
-var bumpers = function (service) {
-  if (service.bumpup) {
-    return;
-  }
-  var post = service.xactions.post;
-  if (!post) {
-    post = {};
-    service.xactions.post = post;
-  }
-  post.bumpup = middlewares.bumpup;
-};
-
 var build = function (service) {
   var serv = _.merge({}, service);
 
@@ -163,12 +151,16 @@ var build = function (service) {
   serv.xactions = serv.xactions || base.xactions;
   serv.workflow = serv.workflow || base.workflow;
 
-  bumpers(serv);
+  var actions = [
+    'find',
+    'findOne',
+    'replaceOne',
+    'removeOne',
+    'createOne',
+    'updateOne'
+  ];
 
-  Object.keys(serv).forEach(function (key) {
-    if (['auth', 'xactions', 'workflow', 'bumpup'].indexOf(key) !== -1) {
-      return;
-    }
+  actions.forEach(function (key) {
     var val = serv[key];
     if (!val || val instanceof Function) {
       return;

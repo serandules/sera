@@ -339,45 +339,6 @@ exports.query = function (req, res, next) {
   next();
 };
 
-exports.bumpup = function (route) {
-  route.use(function (req, res, next) {
-    if (!req.user) {
-      return next(errors.unauthorized());
-    }
-    req.ctx.user = req.user;
-    next();
-  });
-
-  route.use(function (req, res, next) {
-    var ctx = req.ctx;
-    ctx.id = req.params.id;
-    vmodel.bumpable(ctx, next);
-  });
-
-  route.use(function (req, res, next) {
-    var ctx = req.ctx;
-    if (!ctx.found) {
-      return next(errors.notFound());
-    }
-    if (!utils.bumpable(ctx.found)) {
-      return next(errors.forbidden());
-    }
-    ctx.data = {
-      updatedAt: new Date()
-    };
-    next();
-  });
-
-  route.use(function (req, res, next) {
-    utils.update(req.ctx, function (err, o) {
-      if (err) {
-        return next(err);
-      }
-      res.locate(o.id).status(200).send(o);
-    });
-  });
-};
-
 exports.throttleByIP = throttle.byIP;
 
 exports.throttleByAPI = throttle.byAPI;
