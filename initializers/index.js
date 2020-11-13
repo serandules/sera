@@ -23,7 +23,7 @@ var zeroPad = function (name, length) {
   return (Array(length + 1).join('0') + name).slice(-length);
 };
 
-var sort = function (index, scripts) {
+var filter = function (index, scripts) {
   var maxLength = 0
   var names = _.map(scripts, 'name');
   names.forEach(function (path) {
@@ -47,7 +47,6 @@ var sort = function (index, scripts) {
 };
 
 exports.initialize = function (scripts, done) {
-  scripts = coreScripts().concat(scripts);
   sera.model('configs').findOne({name: 'initializers'}).exec(function (err, config) {
     if (err) {
       return done(err);
@@ -57,7 +56,7 @@ exports.initialize = function (scripts, done) {
     alreadyRan.forEach(function (initializer) {
       index[initializer] = true;
     });
-    var run = sort(index, scripts);
+    var run = filter(index, coreScripts()).concat(filter(index, scripts));
     var ran = [];
     async.whilst(function () {
       return run.length;

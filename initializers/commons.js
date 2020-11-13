@@ -16,7 +16,7 @@ exports.meta = function (done) {
         return done(err);
       }
       if (!client) {
-        return done(util.format('No client with name %s can be found.', domain));
+        return done(new Error(util.format('No client with name %s can be found.', domain)));
       }
       sera.model('workflows').find({user: adminUser}, function (err, workflows) {
         if (err) {
