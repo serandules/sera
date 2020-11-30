@@ -7,7 +7,7 @@ var AWS = require('aws-sdk');
 var Redis = require('ioredis');
 var once = require('once');
 var diff = require('deep-object-diff').diff;
-var uuid = require('uuid');
+var uuidv4 = require('uuid/v4');
 var stringify = require('json-stringify-safe');
 var _ = require('lodash');
 var format = require('string-template');
@@ -473,7 +473,7 @@ exports.stringify = function (o) {
 };
 
 exports.uuid = function () {
-  return uuid.v4();
+  return uuidv4();
 };
 
 exports.diff = function (lh, rh) {
