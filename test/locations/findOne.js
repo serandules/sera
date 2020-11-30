@@ -4,7 +4,7 @@ var errors = require('errors');
 var _ = require('lodash');
 var should = require('should');
 var request = require('request');
-var sera = require('sera');
+var sera = require('../../index');
 var pot = require('pot');
 
 describe('GET /locations', function () {
