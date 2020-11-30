@@ -87,9 +87,25 @@ describe('GET /configs/:id', function () {
       if (e) {
         return done(e);
       }
-      r.statusCode.should.equal(errors.unauthorized().status);
+      r.statusCode.should.equal(errors.notFound().status);
       should.exist(b);
-      b.code.should.equal(errors.unauthorized().data.code);
+      b.code.should.equal(errors.notFound().data.code);
+      done();
+    });
+  });
+
+  it('GET /configs/initializers', function (done) {
+    request({
+      uri: pot.resolve('apis', '/v/configs/other'),
+      method: 'GET',
+      json: {}
+    }, function (e, r, b) {
+      if (e) {
+        return done(e);
+      }
+      r.statusCode.should.equal(errors.notFound().status);
+      should.exist(b);
+      b.code.should.equal(errors.notFound().data.code);
       done();
     });
   });
