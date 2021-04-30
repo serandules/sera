@@ -1,0 +1,30 @@
+{
+  "name": "messenger",
+  "description": "messenger",
+  "version": "0.0.0",
+  "author": {
+    "name": "serandives",
+    "email": "serandives@gmail.com"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "lodash": "4.17.4",
+    "async": "1.*",
+    "nconf": "0.10.0",
+    "request": "2.81.0",
+    "logger": "serandules/logger#master",
+    "sera": "serandules/sera#master"
+  },
+  "devDependencies": {
+    "mocha": "3.2.0",
+    "should": "11.2.1",
+    "request": "2.81.0",
+    "pot": "serandules/pot#master"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/serandules/messenger.git"
+  }
+}

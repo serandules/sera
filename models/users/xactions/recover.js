@@ -5,7 +5,7 @@ var path = require('path');
 var dust = require('dustjs-linkedin');
 var util = require('util');
 
-var messenger = require('messenger');
+var messenger = require('../../../messenger');
 
 var utils = require('../../../utils');
 var middlewares = require('../../../middlewares');

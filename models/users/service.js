@@ -6,7 +6,7 @@ var util = require('util');
 var fs = require('fs');
 
 var errors = require('errors');
-var messenger = require('messenger');
+var messenger = require('../../messenger');
 
 var middlewares = require('../../middlewares');
 var utils = require('../../utils');
