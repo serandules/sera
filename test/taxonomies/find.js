@@ -13,11 +13,7 @@ describe('GET /taxonomies', function () {
 
   var data = {
     title: 'Brands',
-    description: 'This is the brands taxonomy.',
-    tags: [
-      {client: true, group: 'models', name: 'model', value: 'binaries'},
-      {client: true, group: 'models', name: 'model', value: 'brands'}
-    ]
+    description: 'This is the brands taxonomy.'
   }
 
   before(function (done) {
@@ -44,8 +40,6 @@ describe('GET /taxonomies', function () {
         b.title.should.equal(data.title);
         should.exist(b.description);
         b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
         should.exist(r.headers['location']);
         r.headers['location'].should.equal(pot.resolve('apis', '/v/taxonomies/' + b.id));
 
@@ -75,8 +69,6 @@ describe('GET /taxonomies', function () {
         b.title.should.equal(data.title);
         should.exist(b.description);
         b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
       });
 
       done();
@@ -105,246 +97,7 @@ describe('GET /taxonomies', function () {
         b.title.should.equal(data.title);
         should.exist(b.description);
         b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
       });
-
-      done();
-    });
-  });
-
-  it('by tag name and value', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              name: 'model',
-              value: 'binaries'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(1);
-
-      b.forEach(function (b) {
-        should.exist(b.title);
-        b.title.should.equal(data.title);
-        should.exist(b.description);
-        b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
-      });
-
-      done();
-    });
-  });
-
-  it('by tag name, value and group', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              group: 'models',
-              name: 'model',
-              value: 'binaries'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(1);
-
-      b.forEach(function (b) {
-        should.exist(b.title);
-        b.title.should.equal(data.title);
-        should.exist(b.description);
-        b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
-      });
-
-      done();
-    });
-  });
-
-  it('by tag name, value, group and client/server', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              client: true,
-              group: 'models',
-              name: 'model',
-              value: 'binaries'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(1);
-
-      b.forEach(function (b) {
-        should.exist(b.title);
-        b.title.should.equal(data.title);
-        should.exist(b.description);
-        b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
-      });
-
-      done();
-    });
-  });
-
-  it('by tag name, value, group and client/server', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              server: true,
-              group: 'models',
-              name: 'model',
-              value: 'binaries'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(0);
-
-      done();
-    });
-  });
-
-  it('by multiple tags', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              group: 'models',
-              name: 'model',
-              value: 'binaries'
-            }, {
-              group: 'models',
-              name: 'model',
-              value: 'brands'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(1);
-
-      b.forEach(function (b) {
-        should.exist(b.title);
-        b.title.should.equal(data.title);
-        should.exist(b.description);
-        b.description.should.equal(data.description);
-        should.exist(b.tags);
-        b.tags.should.deepEqual(data.tags);
-      });
-
-      done();
-    });
-  });
-
-  it('by multiple tags', function (done) {
-    request({
-      uri: pot.resolve('apis', '/v/taxonomies'),
-      method: 'GET',
-      auth: {
-        bearer: client.users[1].token
-      },
-      qs: {
-        data: JSON.stringify({
-          query: {
-            tags: [{
-              group: 'models',
-              name: 'model',
-              value: 'binaries'
-            }, {
-              group: 'models',
-              name: 'model',
-              value: 'notfound'
-            }]
-          }
-        })
-      },
-      json: true
-    }, function (e, r, b) {
-      if (e) {
-        return done(e);
-      }
-
-      r.statusCode.should.equal(200);
-      should.exist(b.length);
-      b.length.should.equal(0);
 
       done();
     });
