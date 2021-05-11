@@ -184,29 +184,23 @@ module.exports.modifiedAt = function (o) {
 };
 
 module.exports.tags = function (o) {
-  var value = {};
-  var validator = {};
-  var fields = Object.keys(o);
-  fields.forEach(function (field) {
-    var tagger = o[field];
-    value[field] = tagger.value;
-    validator[field] = tagger.validator;
-  });
   return function (schema, options) {
     schema.add({
       tags: {
         type: [{
           _id: false,
+          server: Boolean,
+          client: Boolean,
+          group: String,
           name: String,
           value: String
         }],
         default: [],
-        server: true,
         searchable: true,
-        validator: types.tags(validator),
-        value: values.tags(value),
+        validator: types.tags(o),
+        value: values.tags(o),
         query: queries.array({
-          allowed: ['name', 'value']
+          allowed: ['name', 'value', 'server', 'client', 'group']
         })
       }
     });

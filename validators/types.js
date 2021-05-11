@@ -811,45 +811,142 @@ exports._ = function (options) {
   };
 };
 
+/*
+  {name: 'postal', value: '10230', server: true, group: 'location'}
+  schema.plugin(plugins.tags({
+    server: {
+        location: Locations.tagger,
+        contact: Contacts.tagger
+    },
+    client: {
+        enums: ['realestates', 'vehicles', 'phones', 'televisions'],
+        validator: function (tags) {
+
+        },
+        value: function (tags, done) {
+            done(null, tags);
+        }
+    }
+}));
+ */
 exports.tags = function (options) {
   options = options || {};
+
+  var validateClientTags = function (o, tags, done) {
+    if (!tags.length) {
+      return done();
+    }
+
+    if (!options.client) {
+      return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.client'));
+    }
+
+    var validator = options.client.validator;
+    if (!validator) {
+      return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.client'));
+    }
+
+    validator(o, tags, done);
+  };
+
+  var validateServerTags = function (o, tags, done) {
+    if (!tags.length) {
+      return done();
+    }
+
+    if (!options.server) {
+      return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.server'));
+    }
+
+    var tagsByGroup = _.groupBy(tags, 'group');
+
+    async.each(Object.keys(tagsByGroup), function (group, groupDone) {
+      var tags = tagsByGroup[group];
+      var tagger = options.server[group];
+
+      if (!tagger || !tagger.validator) {
+        return groupDone(unprocessableEntity('\'%s\' contains an invalid value', o.field));
+      }
+
+      tagger.validator(o, tags, groupDone);
+    }, done);
+  };
+
   return function (o, done) {
     var i;
-    var entry;
+    var tag;
     var name;
-    var value;
-    var field;
-    var key;
-    var parts;
     var tags = o.value;
+
+    var clientTags = [];
+    var serverTags = [];
+    var otherTags = [];
+
+    tags.forEach(function (tag) {
+      if (tag.client) {
+        return clientTags.push(tag);
+      }
+      if (tag.server) {
+        return serverTags.push(tag);
+      }
+      otherTags.push(tag);
+    });
+
+    if (otherTags.length) {
+      return done(unprocessableEntity('\'%s\' contains an invalid value', o.field));
+    }
+
     var length = tags.length;
     for (i = 0; i < length; i++) {
-      entry = tags[i];
-      name = entry.name;
-      if (!name) {
+      tag = tags[i];
+      name = tag.name;
+
+      if (tag.server && !_.isBoolean(tag.server)) {
+        return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.server'));
+      }
+
+      if (tag.client && !_.isBoolean(tag.client)) {
+        return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.client'));
+      }
+
+      if (!tag.group) {
+        return done(unprocessableEntity('\'%s\' needs to be specified', o.field + '.group'));
+      }
+
+      if (!_.isString(tag.group)) {
+        return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.group'));
+      }
+
+      if (!tag.name) {
         return done(unprocessableEntity('\'%s\' needs to be specified', o.field + '.name'));
       }
-      if (typeof name !== 'string' && !(name instanceof String)) {
-        return done(unprocessableEntity('\'%s\' needs to be a string', o.field + '.name'));
-      }
-      parts = name.split(':');
-      field = parts[0];
-      key = parts[1];
-      if (!field || !key) {
+
+      if (!_.isString(tag.name)) {
         return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.name'));
       }
-      if (!options[field] || options[field].indexOf(key) === -1) {
-        return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.name'));
-      }
-      value = entry.value;
-      if (!value) {
+
+      if (!tag.value) {
         return done(unprocessableEntity('\'%s\' needs to be specified', o.field + '.value'));
       }
-      if (typeof value !== 'string' && !(value instanceof String)) {
-        return done(unprocessableEntity('\'%s\' needs to be a string', o.field + '.value'));
+
+      if (!_.isString(tag.value)) {
+        return done(unprocessableEntity('\'%s\' contains an invalid value', o.field + '.value'));
       }
     }
-    done(null, tags);
+
+    validateClientTags(o, clientTags, function (err) {
+      if (err) {
+        return done(err);
+      }
+
+      validateServerTags(o, serverTags, function (err) {
+        if (err) {
+          return done(err);
+        }
+
+        done(null, tags);
+      });
+    });
   };
 };
 

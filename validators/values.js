@@ -1,5 +1,6 @@
 var async = require('async');
 var crypto = require('crypto');
+var _ = require('lodash');
 
 var utils = require('../utils');
 
@@ -25,25 +26,93 @@ exports.tier = function (options) {
 
 exports.tags = function (options) {
   options = options || {};
-  return function (o, done) {
-    var tags = [];
-    var fields = Object.keys(options);
+
+  var clientTagValues = function (o, tags, done) {
+    if (!options.client) {
+      return done(null, tags); // TODO: verify invalid tags
+    }
+
+    var tagger = options.client;
+
+    if (!tagger.value) {
+      return done(null, tags);
+    }
+
+    tagger.value(o, tags, function (err, tags) {
+      if (err) {
+        return done(err);
+      }
+      done(null, tags);
+    });
+  };
+
+  var serverTagValues = function (o, tags, done) {
+    if (!options.server) {
+      return done(null, tags); // TODO: verify invalid tags
+    }
+
+    var serverTags = [];
     var data = o.data;
+    var fields = Object.keys(options.server);
+
     async.each(fields, function (field, eachDone) {
       var value = data[field];
       if (!value) {
         return eachDone();
       }
-      var tagger = options[field];
-      tagger(field, value, function (err, tagz) {
+
+      var tagger = options.server[field];
+
+      tagger.value(o, field, value, function (err, fieldTags) {
         if (err) {
           return eachDone(err);
         }
-        tags = tags.concat(tagz);
+        serverTags = serverTags.concat(fieldTags);
         eachDone();
       });
     }, function (err) {
-      done(err, tags);
+      if (err) {
+        return done(err);
+      }
+
+      serverTags.forEach(function (tag) {
+        tag.server = true;
+      });
+
+      done(err, serverTags);
+    });
+  };
+
+  return function (o, done) {
+    var data = o.data;
+    var tags = data.tags || [];
+
+    var clientTags = [];
+    var serverTags = [];
+    var otherTags = [];
+
+    tags.forEach(function (tag) {
+      if (tag.client) {
+        return clientTags.push(tag);
+      }
+      if (tag.server) {
+        return serverTags.push(tag);
+      }
+      otherTags.push(tag);
+    });
+
+    clientTagValues(o, clientTags, function (err, clientTags) {
+      if (err) {
+        return done(err);
+      }
+
+      serverTagValues(o, serverTags, function (err, serverTags) {
+        if (err) {
+          return done(err);
+        }
+
+        done(null, otherTags.concat(clientTags).concat(serverTags));
+      });
     });
   };
 };

@@ -6,6 +6,8 @@ var plugins = require('../../plugins');
 var validators = require('../../validators');
 var utils = require('../../utils');
 
+var tagger = require('./tagger');
+
 var types = validators.types;
 
 var schema = Schema({
@@ -48,8 +50,12 @@ schema.plugin(plugins.createdAt());
 schema.plugin(plugins.updatedAt());
 schema.plugin(plugins.modifiedAt());
 
+schema.plugin(plugins.tags({
+    client: tagger
+}));
+
 utils.ensureIndexes(schema, [
-  {updatedAt: -1, _id: -1}
+    {updatedAt: -1, _id: -1}
 ]);
 
 module.exports = mongoose.model('taxonomies', schema);
