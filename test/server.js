@@ -46,7 +46,8 @@ exports.prepare = function (done) {
       users: {
         plugins: userPlugins
       },
-      locations: require('./locations')
+      locations: require('./locations'),
+      brands: require('./brands')
     }, done);
   });
 };
