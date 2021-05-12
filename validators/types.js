@@ -6,6 +6,8 @@ var _ = require('lodash');
 
 var errors = require('errors');
 
+var queries = require('./queries');
+
 var utils = require('../utils');
 var commons = require('./commons');
 
@@ -211,6 +213,9 @@ exports.groups = function (options) {
     if (min > groups.length) {
       return done(unprocessableEntity('\'%s\' needs to contain more values', field));
     }
+    if (o.query) {
+      return done(null, groups);
+    }
     async.each(groups, function (v, validated) {
       var validator = exports.ref();
       validator({
@@ -235,7 +240,7 @@ exports.groups = function (options) {
             return done(err);
           }
           if (!groupz || (groups.length !== groupz.length)) {
-            return done(unprocessableEntity('\'%s\' contains invalid values', field));
+            return done(unprocessableEntity('\'%s\' contains an invalid value', field));
           }
           done(null, groups);
         });
@@ -872,7 +877,14 @@ exports.tags = function (options) {
     }, done);
   };
 
+  var validateQuery = queries.array({
+    allowed: ['name', 'value', 'server', 'client', 'group']
+  });
+
   return function (o, done) {
+    if (o.query) {
+      return validateQuery(o, done);
+    }
     var i;
     var tag;
     var name;

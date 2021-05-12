@@ -198,10 +198,7 @@ module.exports.tags = function (o) {
         default: [],
         searchable: true,
         validator: types.tags(o),
-        value: values.tags(o),
-        query: queries.array({
-          allowed: ['name', 'value', 'server', 'client', 'group']
-        })
+        value: values.tags(o)
       }
     });
   };

@@ -91,48 +91,70 @@ var validateQuery = function (ctx, done) {
         id: o.id,
         options: o
       };
-      if (o.query) {
-        return o.query(oo, function (err, updated) {
-          if (err) {
-            return validated(err);
-          }
-          query[field] = updated;
-          validated();
-        });
-      }
       validator(oo, function (err, value) {
         if (err) {
-          return validated();
+          return validated(err);
         }
-        oo.value = value;
-        validated();
+        // oo.value = value;
+        validated(null, value);
       });
     };
 
-    var validateIn = function (val, validated) {
+    var validateIn = function (value, validated) {
+      var val = value.$in;
       if (!Array.isArray(val)) {
         return validated(errors.badRequest('\'data.query\' contains an invalid value'));
       }
+      var $in = [];
       async.each(val, function (v, valid) {
-        validate(v, valid);
-      }, validated);
+        validate(v, function (err, v) {
+          if (err) {
+            return valid(err);
+          }
+          $in.push(v);
+          valid();
+        });
+      }, function (err) {
+        if (err) {
+          return validated(err);
+        }
+        value.$in = $in;
+        validated();
+      });
     };
 
     if (value.$in) {
       delete value.$lte;
       delete value.$gte;
-      return validateIn(value.$in, eachDone);
+      return validateIn(value, eachDone);
     }
 
     if (!value.$lte && !value.$gte) {
-      return validate(value, eachDone);
+      return validate(value, function (err, val) {
+        if (err) {
+          return eachDone(err);
+        }
+        query[field] = val;
+        eachDone();
+      });
     }
 
-    validate(value.$lte, function (err) {
+    validate(value.$lte, function (err, val) {
       if (err) {
         return eachDone(err);
       }
-      validate(value.$gte, eachDone);
+      if (val) {
+        value.$lte = val;
+      }
+      validate(value.$gte, function (err, val) {
+        if (err) {
+          return eachDone(err);
+        }
+        if (val) {
+          value.$gte = val;
+        }
+        eachDone();
+      });
     });
   }, function (err) {
     if (err) {
