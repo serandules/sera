@@ -64,6 +64,7 @@ describe('GET /users/:id', function () {
       should.exist(b);
       should.exist(b.id);
       should.exist(b.email);
+      should.not.exist(b.password);
       b.id.should.equal(user.id);
       b.email.should.equal('findone-user@serandives.com');
       request({

@@ -52,7 +52,11 @@ var schema = Schema({
   }
 }, {collection: 'users'});
 
-schema.plugin(plugins());
+schema.plugin(plugins({
+  transform: function (o) {
+    delete o.password;
+  }
+}));
 schema.plugin(plugins._({
   workflow: 'model-users'
 }));
