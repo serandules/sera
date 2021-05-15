@@ -17,8 +17,6 @@
   "FACEBOOK_ID": "facebook-id",
   "FACEBOOK_SECRET": "facebook-secret",
   "GOOGLE_KEY": "google-key",
-  "AWS_KEY": "aws-key",
-  "AWS_SECRET": "aws-secret",
   "CAPTCHA_URI": "http://localhost:6060/captcha",
   "CAPTCHA_KEY": "captcha-key",
   "CAPTCHA_SECRET": "captcha-secret",
