@@ -877,13 +877,56 @@ exports.tags = function (options) {
     }, done);
   };
 
-  var validateQuery = queries.array({
+  var validateTypeField = function (type, tag) {
+    if (tag[type] === 'true' || tag[type] === true) {
+      tag[type] = Boolean(tag[type]);
+      return true;
+    }
+    return false;
+  }
+
+  var validateTags = queries.array({
     allowed: ['name', 'value', 'server', 'client', 'group']
   });
 
+  var validateClientTagsQuery = function (o, done) {
+    var tags = o.value;
+    if (!Array.isArray(tags)) {
+      return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+    }
+    var i;
+    var tag;
+    var length = tags.length;
+    for (i = 0; i < length; i++) {
+      tag = tags[i];
+      if (tag.server) {
+        if (validateTypeField('server', tag)) {
+          continue;
+        }
+        return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+      }
+      if (tag.client) {
+        if (validateTypeField('client', tag)) {
+          continue;
+        }
+        return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+      }
+      if (tag.group && !_.isString(tag.group)) {
+        return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+      }
+      if (tag.name && !_.isString(tag.name)) {
+        return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+      }
+      if (tag.value && !_.isString(tag.value)) {
+        return unprocessableEntity('\'%s\' contains an invalid value', o.field);
+      }
+    }
+    return validateTags(o, done);
+  };
+
   return function (o, done) {
     if (o.query) {
-      return validateQuery(o, done);
+      return validateClientTagsQuery(o, done);
     }
     var i;
     var tag;
