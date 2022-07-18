@@ -33,7 +33,6 @@
     "logger": "serandules/logger#master",
     "errors": "serandules/errors#master",
     "lock": "serandules/lock#master",
-    "messenger": "serandules/messenger#master",
     "permission": "serandules/permission#master",
     "mongutils": "serandules/mongutils#master"
   },
